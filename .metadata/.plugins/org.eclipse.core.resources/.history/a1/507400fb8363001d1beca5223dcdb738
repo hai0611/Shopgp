@@ -1,0 +1,5 @@
+package com.shopgp.admin.user;
+
+public class NotFoundUserExeption extends Exception {
+
+}
