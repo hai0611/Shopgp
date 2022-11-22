@@ -84,14 +84,22 @@
 			<tbody>
 				<tr th:each = "user: ${listUser}">
 					<td>[[${user.id}]]</td>
-					<td><span class="fa-solid fa-image-portrait fa-3x icon-dark"></span></td>
+					<td>
+						<span th:if="${user.photos == null}" class="fa-solid fa-image-portrait fa-3x icon-dark"></span>
+						<img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}" 
+						class="fa-solid fa-3x icon-dark" style="width:100px"></img>
+					</td>
 					<td>[[${user.email}]]</td>
 					<td>[[${user.fistName}]]</td>
 					<td>[[${user.lastName}]]</td>
 					<td>[[${user.roles}]]</td>
 					<td>
-						<a th:if = "${user.enabled == true}" class="fa-2x fa-solid fa-circle-check icon-green" href=""></a>
-						<a th:if = "${user.enabled == false}" class="fa-2x fa-solid fa-circle-check icon-dark" href=""></a>
+						<a th:if = "${user.enabled == true}" class="fa-2x fa-solid fa-circle-check icon-green" 
+						th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
+						title="Disable this user"></a>
+						<a th:if = "${user.enabled == false}" class="fa-2x fa-solid fa-circle icon-dark" 
+						th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
+						title="Enable this user"></a>
 					</td>
 					<td>
 						<a class="icon-green fa-2x fa-solid fa-pen-to-square" th:href="@{'/users/edit/'+${user.id}}"
@@ -103,6 +111,35 @@
 				</tr>
 			</tbody>
 		</table>
+	</div>
+	
+	<div class="text-center m-1" th:if="${totalItems > 0}">
+		Showing users # [[${startCount}]] to [[${endCount}]] of [[${totalItems}]]
+	</div>
+	<div class="text-center m-1" th:unless="${totalItems > 0}">
+		No users found
+	</div>
+	
+	<div class ="showing-bottom text-center">
+	<nav>	
+		<ul class="pagination justify-content-center">
+			<li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+	  			<a class="page-link" th:href="@{/users/page/1}">First</a>
+	  		</li>
+	  		<li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+	  			<a class="page-link" th:href="@{'/users/page/' + ${currentPage-1}}">Previous</a>
+	  		</li>
+            <li th:class="${currentPage == i ? 'page-item active' : 'page-item'}" th:each="i : ${#numbers.sequence(1,totalPages)}">
+            	<a class="page-link" th:href="@{'/users/page/' + ${i}}">[[${i}]]</a>
+            </li>
+	  		<li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+	  			<a class="page-link" th:href="@{'/users/page/' + ${currentPage+1}}">Next</a>
+	  		</li>
+	  		<li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+	  			<a class="page-link" th:href="@{'/users/page/' + ${totalPages}}">Last</a>
+	  		</li>
+		</ul>
+	</nav>
 	</div>
 	
 	<div class="modal fade text-center" id="confirmModal">

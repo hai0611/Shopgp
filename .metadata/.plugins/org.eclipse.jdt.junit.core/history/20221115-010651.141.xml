@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><testrun name="UserRepositoryTests.testCountById" project="ShopgpBackend" tests="1" started="1" failures="0" errors="0" ignored="0">
-  <testsuite name="com.shopgp.admin.user.UserRepositoryTests" time="0.168" displayname="UserRepositoryTests" uniqueid="[engine:junit-jupiter]/[class:com.shopgp.admin.user.UserRepositoryTests]">
-    <testcase name="testCountById" classname="com.shopgp.admin.user.UserRepositoryTests" time="0.168" displayname="testCountById()" uniqueid="[engine:junit-jupiter]/[class:com.shopgp.admin.user.UserRepositoryTests]/[method:testCountById()]"/>
-  </testsuite>
-</testrun>

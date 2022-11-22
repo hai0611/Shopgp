@@ -3,7 +3,12 @@ package com.shopgp.admin.user;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +16,9 @@ import com.shopgp.common.entity.Role;
 import com.shopgp.common.entity.User;
 
 @Service
+@Transactional
 public class UserService {
+	public static final int USERS_PER_PAGE = 4;
 	
 	@Autowired
 	private UserRepository userRepo;
@@ -24,6 +31,11 @@ public class UserService {
 	
 	public List<User> listAll() {
 		return (List<User>) userRepo.findAll();
+	}
+	
+	public Page<User> listByPage(int pageNumber) {
+		Pageable pageable = PageRequest.of(pageNumber-1,USERS_PER_PAGE);
+		return userRepo.findAll(pageable);
 	}
 
 	public List<Role> listRole() {
@@ -73,4 +85,10 @@ public class UserService {
 		}
 		userRepo.deleteById(id);
 	}
+	
+	public void updateUserEnabledStatus(Integer id, boolean enabled) {
+		userRepo.updateEnabledStatus(id, enabled);
+	}
+	
+	
 }

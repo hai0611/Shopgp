@@ -1,15 +1,22 @@
 package com.shopgp.admin.user;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.util.StringUtils;
 
+import com.shopgp.admin.FileUploadUtil;
 import com.shopgp.common.entity.Role;
 import com.shopgp.common.entity.User;
 
@@ -20,11 +27,26 @@ public class UserController {
 	private UserService service;
 	
 	@GetMapping("/users")
-	public String listAll(Model model) {
-		List<User> listUser = service.listAll();
-		model.addAttribute("listUser",listUser);
-		return "users";
+	public String listFirstPage(Model model) {
+		return listByPage(1, model);
 	} 
+	
+	@GetMapping("/users/page/{pageNumber}")
+	public String listByPage(@PathVariable(name="pageNumber") int pageNumber, Model model) {
+		Page<User>page = service.listByPage(pageNumber);
+		long startCount = (pageNumber-1)*service.USERS_PER_PAGE + 1;
+		long endCount = startCount + service.USERS_PER_PAGE - 1;
+		if(endCount > page.getTotalElements()) {
+			endCount = page.getTotalElements();
+		}
+		model.addAttribute("startCount",startCount);
+		model.addAttribute("endCount",endCount);
+		model.addAttribute("currentPage",pageNumber);
+		model.addAttribute("totalPages",page.getTotalPages());
+		model.addAttribute("totalItems",page.getTotalElements());
+		model.addAttribute("listUser",page.getContent());
+		return "users";
+	}
 	
 	@GetMapping("/users/new")
 	public String newUser(Model model) {
@@ -38,14 +60,25 @@ public class UserController {
 	}
 	
 	@PostMapping("/users/save")
-	public String saveUser(User user, RedirectAttributes redirectAttributes) {
-		service.saveUser(user);
+	public String saveUser(User user,
+			RedirectAttributes redirectAttributes,@RequestParam("image") MultipartFile multiFile) throws IOException {
+		if(!multiFile.isEmpty()) {
+			String fileName = StringUtils.cleanPath(multiFile.getOriginalFilename());
+			user.setPhotos(fileName);
+			service.saveUser(user);
+			String uploadDir = "user-photos/"+user.getId();
+			FileUploadUtil.cleanDir(uploadDir);
+			FileUploadUtil.saveFile(uploadDir,fileName, multiFile);
+		} else {
+			if(user.getPhotos().isEmpty()) user.setPhotos(null);
+			service.saveUser(user);
+		}
 		redirectAttributes.addFlashAttribute("message", "User have been add sucessfully.");
 		return "redirect:/users";
 	}
 	
 	@GetMapping("/users/edit/{id}")
-	public String editUser(@PathVariable(name="id") Integer id,Model model, RedirectAttributes redirectAttributes) {
+	public String editUser(@PathVariable(name="id") Integer id,Model model, RedirectAttributes redirectAttributes) throws IOException {
 		try {
 		User user = service.get(id);
 		model.addAttribute("user",user);
@@ -67,6 +100,16 @@ public class UserController {
 		} catch(NotFoundUserExeption ex) {
 			redirectAttributes.addFlashAttribute("message", ex.getMessage());
 		}
+		return "redirect:/users";
+	}
+	
+	@GetMapping("/users/{id}/enabled/{status}")
+	public String updateUserEnabledStatus(@PathVariable("id")Integer id,
+			@PathVariable("status")boolean enabled,RedirectAttributes redirectAttributes) {
+		service.updateUserEnabledStatus(id, enabled);
+		String status = enabled ? "enabled" : "disabled";
+		String message = "The user ID "+id+" has been" + status;
+		redirectAttributes.addFlashAttribute("message",message);
 		return "redirect:/users";
 	}
 }

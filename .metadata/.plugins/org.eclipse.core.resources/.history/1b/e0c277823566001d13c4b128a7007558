@@ -1,0 +1,5 @@
+package com.shopgp.admin;
+
+public class FileUploadUtil {
+
+}

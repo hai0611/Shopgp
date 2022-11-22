@@ -1,5 +1,0 @@
-package com.shopgp.admin.security;
-
-public class WebSecurityConfig {
-
-}
