@@ -1,0 +1,9 @@
+.icon-white {color: white}
+.icon-silver {color: silver}
+.icon-green {color: green}
+.icon-dark {color: gray}
+.sort-icon {
+	position: relative;
+    top: 5px;
+    left: 4px;
+}

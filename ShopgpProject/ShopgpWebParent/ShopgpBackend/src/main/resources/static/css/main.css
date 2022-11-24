@@ -2,3 +2,13 @@
 .icon-silver {color: silver}
 .icon-green {color: green}
 .icon-dark {color: gray}
+.sort-icon-up {
+	position: relative;
+    top: 5px;
+    left: 4px;
+}
+.sort-icon-down {
+	position: relative;
+    top: -3px;
+    left: 4px;
+}
