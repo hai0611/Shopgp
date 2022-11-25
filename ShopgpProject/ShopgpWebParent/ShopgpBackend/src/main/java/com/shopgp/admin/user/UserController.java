@@ -28,16 +28,17 @@ public class UserController {
 	
 	@GetMapping("/users")
 	public String listFirstPage(Model model) {
-		return listByPage("fistName","asc",1, model);
+		return listByPage("fistName","asc",null,1, model);
 	} 
 	
 	@GetMapping("/users/page/{pageNumber}")
 	public String listByPage(
 			@RequestParam(value = "sortField", required = false) String sortField,
 			@RequestParam(value = "sortDir", required = false) String sortDir,
+			@RequestParam(value = "keyword", required = false) String keyword,
 			@PathVariable(name="pageNumber") int pageNumber, 
 			Model model) {
-		Page<User>page = service.listByPage(pageNumber, sortField, sortDir);
+		Page<User>page = service.listByPage(pageNumber, sortField, sortDir, keyword);
 		long startCount = (pageNumber-1)*service.USERS_PER_PAGE + 1;
 		long endCount = startCount + service.USERS_PER_PAGE - 1;
 		if(endCount > page.getTotalElements()) {
@@ -55,6 +56,7 @@ public class UserController {
 		model.addAttribute("sortField",sortField);
 		model.addAttribute("sortDir",sortDir);
 		model.addAttribute("reverseSortDir",reverseSortDir);
+		model.addAttribute("keyword",keyword);
 		return "users";
 	}
 	

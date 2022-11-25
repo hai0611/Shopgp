@@ -117,4 +117,15 @@ public class UserRepositoryTests {
 		System.out.println(page.getTotalPages());
 		listUser.forEach(System.out::println);
 	}
+	
+	@Test 
+	public void testSearchUser () {
+		int pageNumber = 0;
+		int pageSize = 4;
+		Pageable pageable = PageRequest.of(pageNumber,pageSize);
+		Page<User> page = repo.findAll("bruce",pageable);
+		List<User>listUser = page.getContent();
+		System.out.println(page.getTotalPages());
+		listUser.forEach(System.out::println);
+	}
 }
